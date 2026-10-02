@@ -1,0 +1,16 @@
+--!strict
+local Checkpoints = require(script.Parent.Checkpoints)
+local KillParts = require(script.Parent.KillParts)
+local Leaderboard = require(script.Parent.Leaderboard)
+local PlayerCollisions = require(script.Parent.PlayerCollisions)
+local PlayerData = require(script.Parent.PlayerData)
+local Spawning = require(script.Parent.Spawning)
+local Spinners = require(script.Parent.Spinners)
+
+PlayerData.start()
+Leaderboard.start()
+Checkpoints.start()
+Spawning.start()
+KillParts.start()
+PlayerCollisions.start()
+Spinners.start()
