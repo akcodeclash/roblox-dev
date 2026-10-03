@@ -50,16 +50,9 @@ local function buildStage(spec)
 	for _, p in spec.parts do
 		local position = spec.origin + p.offset
 		if p.kind == "pad" then
-			local className = if spec.number == 1 and p.stage == nil then "SpawnLocation" else "Part"
-			local pad = newPart(className, "Checkpoint", p.size, position, p.color or PAD_COLOR, model)
+			local pad = newPart("Part", "Checkpoint", p.size, position, p.color or PAD_COLOR, model)
 			pad:SetAttribute("Stage", p.stage or spec.number)
 			CollectionService:AddTag(pad, "Checkpoint")
-			if pad:IsA("SpawnLocation") then
-				pad.Neutral = true
-				pad.Duration = 0
-				-- Turn the pad so players spawn facing down the course (+Z).
-				pad.CFrame = CFrame.new(position) * CFrame.Angles(0, math.pi, 0)
-			end
 			walkable(pad)
 		elseif p.kind == "platform" then
 			walkable(newPart("Part", "Platform", p.size, position, spec.color, model))
@@ -77,31 +70,13 @@ local function buildStage(spec)
 			CollectionService:AddTag(conveyor, "Conveyor")
 			walkable(conveyor)
 		elseif p.kind == "spinner" then
-			local pivot = newPart("Part", "SpinnerPivot", Vector3.new(1, 1, 1), position, spec.color, model)
-			pivot.Transparency = 1
-			pivot.CanCollide = false
-			pivot.CanTouch = false
+			-- Anchored; the Spinners modules turn it from the server clock (no physics).
 			local bar = newPart("Part", "SpinnerBar", p.size, position, KILL_COLOR, model)
 			bar.Material = Enum.Material.Neon
-			bar.Anchored = false
 			bar.CanCollide = false
+			bar:SetAttribute("Pivot", position)
 			bar:SetAttribute("SpinSpeed", p.speed)
-			CollectionService:AddTag(bar, "KillPart")
 			CollectionService:AddTag(bar, "Spinner")
-			-- A hinge turns about its attachments' X axis; rotate them so X points up.
-			local pivotAttachment = Instance.new("Attachment")
-			pivotAttachment.CFrame = CFrame.Angles(0, 0, math.pi / 2)
-			pivotAttachment.Parent = pivot
-			local barAttachment = Instance.new("Attachment")
-			barAttachment.CFrame = CFrame.Angles(0, 0, math.pi / 2)
-			barAttachment.Parent = bar
-			local hinge = Instance.new("HingeConstraint")
-			hinge.Attachment0 = pivotAttachment
-			hinge.Attachment1 = barAttachment
-			hinge.ActuatorType = Enum.ActuatorType.Motor
-			hinge.AngularVelocity = p.speed
-			hinge.MotorMaxTorque = math.huge
-			hinge.Parent = pivot
 		else
 			error("unknown part kind: " .. tostring(p.kind))
 		end

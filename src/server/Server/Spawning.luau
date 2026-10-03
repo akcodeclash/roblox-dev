@@ -12,7 +12,7 @@ local PAD_CLEARANCE = 4
 
 local Spawning = {}
 
--- Stage 1 needs nothing: the engine spawns characters on the stage 1 pad, which is a SpawnLocation.
+-- Stage 1 needs nothing: the engine spawns characters on the lobby's SpawnLocation (Workspace.Lobby.Spawn).
 local function placeOnPad(player: Player)
 	local stage = PlayerData.getStage(player)
 	if stage == Rules.FIRST_STAGE then

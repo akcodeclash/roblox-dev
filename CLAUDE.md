@@ -69,7 +69,10 @@ These follow Roblox's own guidance (`scripting/locations.md` and the `scripting/
 ## The game
 
 - Stages live in `Workspace.Stages` as `Stage1` to `Stage10`. Each pad is tagged `Checkpoint` with a number attribute `Stage`; the finish pad is `Stage = 11`. Hazards are tagged `KillPart`.
-- The stage 1 pad is a `SpawnLocation`. Conveyors are anchored parts with `AssemblyLinearVelocity` set; spinners are unanchored bars on a `HingeConstraint` motor, tagged `Spinner` so the server keeps their network ownership. Neither needs code to move.
+- Conveyors are anchored parts with `AssemblyLinearVelocity` set and need no code.
+- Spinner bars are anchored parts tagged `Spinner` with `Pivot` (Vector3) and `SpinSpeed` (radians per second) attributes, and are not tagged `KillPart`. `Shared.SpinnerMotion` computes a bar's pose from `workspace:GetServerTimeNow()`. The client module `Client.Spinners` sets each bar's CFrame every frame; the server module `Server.Spinners` never moves the bar, and instead tests each character against the bar's pose rewound by half that player's ping with `GetPartBoundsInBox`. Physics-driven bars were dropped because clients rendered them about 180 ms behind the server, so hits landed 3 to 5 studs away from the visible bar. On the server, bars appear frozen at their build pose; that is expected.
+- `Workspace.Lobby.LobbyPlatform` is a 100 by 100 hangout platform directly behind the stage 1 pad (toward -Z), same height. `Workspace.Lobby.Spawn` on it is the game's only `SpawnLocation`; players at stage 1 spawn there and `Spawning` leaves them alone. Pad 1 is a plain `Part`. The lobby is outside `Workspace.Stages`, so the gap checker ignores it.
+- `Workspace.KillFloor` is an invisible, non-colliding 400 by 1400 part at y = 80 tagged `KillPart`. A player who falls off dies there, so the normal death sound and respawn run, instead of being silently destroyed at `FallenPartsDestroyHeight`.
 - Characters are in the `Players` collision group and pass through each other.
 - Every part a player walks on has a number attribute `Order`. After moving or adding parts, run `tools/check_gaps.luau` through `execute_luau` to confirm every jump is still possible.
 - Unit tests run automatically at server start in Studio (`UnitTestRunner.server.luau`). Start a playtest and read `get_console_output` for the `[SUMMARY]` line.
